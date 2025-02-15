@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tech Fest - Interactive Background</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        /* Main container */
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Neural network nodes */
+        .node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #4a90e2;
+            border-radius: 50%;
+            pointer-events: none;
+            transition: transform 0.3s ease;
+        }
+
+        /* Connection lines */
+        .connection {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(74,144,226,0.2) 0%, rgba(74,144,226,0) 100%);
+            height: 1px;
+            transform-origin: left center;
+            pointer-events: none;
+        }
+
+        /* Glow effect for nodes */
+        .node::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, rgba(74,144,226,0.3) 0%, rgba(74,144,226,0) 70%);
+            border-radius: 50%;
+            transform: translate(-4px, -4px);
+        }
+
+        /* Floating elements */
+        .floating-icon {
+            position: absolute;
+            color: rgba(74, 144, 226, 0.2);
+            pointer-events: none;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        /* Animation keyframes */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Mouse follower */
+          .mouse-follower {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(74,144,226,0.1) 0%, rgba(74,144,226,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s ease;
+        }
+
+        /* Content overlay */
+        .content {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #4a90e2, #a64ae2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+<!--------------------------navabar staring--------------------------------------->
+ <header>
+        <nav>
+            <div class="nav-wrapper">
+                <a href="#" class="logo">AI Tech Fest 2025</a>
+                <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#events">Events</a></li>
+                    <li><a href="#registration">Registration</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+ <!--------------------------navabar end----------------------------------------------------->
+ <!--------------------------backgun srt--------------------------------------------------->
+ <main>
+    <div class="container">
+        <div class="mouse-follower"></div>
+        <div id="background"></div>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>cynex</h1>
+                    <p>Harness the power of artificial intelligence to transform your business. Our cutting-edge AI solutions help you stay ahead in the digital age.</p>
+                    <a href="#contact" class="cta-button">Get Started</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gaming Section -->
+        <section class="hero has-before" id="home">
+            <div class="container">
+                <p class="section-subtitle">Enjoy The Games</p>
+                <h1 class="h1 title hero-title">Epic Games Made For <br> True Gamers!</h1>
+                <a href="https://www.facebook.com/IcomDigitalAgency" class="btn" data-btn>Join With Us</a>
+
+                <div class="hero-banner">
+                    <img src="./assets/images/hero-banner.png" width="850" height="414" alt="hero banner" class="w-100">
+                    <img src="./assets/images/hero-banner-bg.png" alt="" class="hero-banner-bg">
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+
+<!--------------------------backgun end----------------------------------------------------->
+ <script src="script.js"></script>
+    <script>
+        // Background initialization
+        class InteractiveBackground {
+            constructor() {
+                this.container = document.querySelector('.container');
+                this.background = document.getElementById('background');
+                //this.mouseFollower = document.querySelector('.mouse-follower');
+                this.nodes = [];
+                this.connections = [];
+                this.mousePosition = { x: 0, y: 0 };
+                
+                this.init();
+                this.addEventListeners();
+                this.animate();
+            }
+
+            init() {
+                // Create nodes
+                const nodeCount = 50;
+                for (let i = 0; i < nodeCount; i++) {
+                    const node = document.createElement('div');
+                    node.className = 'node';
+                    node.style.left = `${Math.random() * 100}%`;
+                    node.style.top = `${Math.random() * 100}%`;
+                    this.background.appendChild(node);
+                    this.nodes.push({
+                        element: node,
+                        x: Math.random() * window.innerWidth,
+                        y: Math.random() * window.innerHeight,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5
+                    });
+                }
+
+                // Create connections
+                this.createConnections();
+            }
+
+            createConnections() {
+                // Clear existing connections
+                this.connections.forEach(conn => conn.element.remove());
+                this.connections = [];
+
+                // Create new connections between nearby nodes
+                for (let i = 0; i < this.nodes.length; i++) {
+                    for (let j = i + 1; j < this.nodes.length; j++) {
+                        const distance = this.getDistance(
+                            this.nodes[i].x,
+                            this.nodes[i].y,
+                            this.nodes[j].x,
+                            this.nodes[j].y
+                        );
+
+                        if (distance < 150) {
+                            const connection = document.createElement('div');
+                            connection.className = 'connection';
+                            this.background.appendChild(connection);
+                            this.connections.push({
+                                element: connection,
+                                start: this.nodes[i],
+                                end: this.nodes[j]
+                            });
+                        }
+                    }
+                }
+            }
+
+            getDistance(x1, y1, x2, y2) {
+                return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            }
+
+            addEventListeners() {
+                document.addEventListener('mousemove', (e) => {
+                    this.mousePosition = {
+                        x: e.clientX,
+                        y: e.clientY
+                    };
+
+                    // Update mouse follower position
+                    this.mouseFollower.style.left = `${e.clientX}px`;
+                    this.mouseFollower.style.top = `${e.clientY}px`;
+                });
+
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    this.createConnections();
+                });
+            }
+
+            animate() {
+                // Update node positions
+                this.nodes.forEach(node => {
+                    // Update position based on velocity
+                    node.x += node.vx;
+                    node.y += node.vy;
+
+                    // Bounce off walls
+                    if (node.x < 0 || node.x > window.innerWidth) node.vx *= -1;
+                    if (node.y < 0 || node.y > window.innerHeight) node.vy *= -1;
+
+                    // Mouse interaction
+                    const dx = this.mousePosition.x - node.x;
+                    const dy = this.mousePosition.y - node.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 100) {
+                        const angle = Math.atan2(dy, dx);
+                        node.x -= Math.cos(angle) * 0.5;
+                        node.y -= Math.sin(angle) * 0.5;
+                    }
+
+                    // Update node element position
+                    node.element.style.transform = `translate(${node.x}px, ${node.y}px)`;
+                });
+
+                // Update connections
+                this.connections.forEach(connection => {
+                    const dx = connection.end.x - connection.start.x;
+                    const dy = connection.end.y - connection.start.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const angle = Math.atan2(dy, dx);
+
+                    connection.element.style.width = `${distance}px`;
+                    connection.element.style.transform = `translate(${connection.start.x}px, ${connection.start.y}px) rotate(${angle}rad)`;
+                });
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize the background when the page loads
+        window.addEventListener('load', () => {
+            new InteractiveBackground();
+        });
+        
+    </script>
+</body>
+</html>
